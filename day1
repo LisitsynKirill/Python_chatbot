@@ -1,0 +1,46 @@
+import random
+import nltk
+
+BOT_CONFIG = {
+    'intents':{
+        'hello':{
+            'examples':['HI', 'HELLO', 'GOOD AFTERNOON'],
+            'responces':["HI!", 'HELLO!', 'GOOD AFTERNOON!']
+        },
+        'bye':{
+            'examples':["BYE", "GOOD BYE", "ARIVIDERCHY"],
+            'responces':["BYE!", "GOOD BYE!", "ARIVIDERCHY!"]
+        }
+    }
+}
+
+
+def clean(text):
+  text = text.lower()    #регистр
+  cleaned_text = ''    #оставляем только буквы
+  for ch in text:
+    if ch in 'abcdefghijklmnopqrstuxwz':
+      cleaned_text = cleaned_text+ch
+  return cleaned_text
+
+
+def get_intent(text):
+  for intent in BOT_CONFIG['intents'].keys():
+    for example in BOT_CONFIG['intents'][intent]['examples']:
+      w1 = clean(example)
+      w2 = clean(text)
+      if nltk.edit_distance(w1, w2) / max(len(w1), len(w2)) <0.4:
+        return intent
+  return 'intent not found'
+  
+
+def bot(questions):
+  intent = get_intent(question)
+  if intent != 'intent not found':
+    print(random.choice(BOT_CONFIG['intents'][intent]['responces']))
+  else: print(intent)
+
+question = ''
+while question != 'stop':
+  question=input('Write here ')
+  bot(question)
