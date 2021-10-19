@@ -56,7 +56,7 @@ BOT_CONFIG = {
 
 def clean(text):
   text = text.lower()    #перевод в нижний регистр
-  cleaned_text = ''    #оставляем только буквы
+  cleaned_text = ''    #оставляем только цифробуквы
   for ch in text:
     if ch in '1234567890abcdefghijklmnopqrstuxwz ':
       cleaned_text = cleaned_text+ch
