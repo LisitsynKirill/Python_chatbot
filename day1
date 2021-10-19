@@ -1,5 +1,9 @@
 import random
 import nltk
+import json
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 BOT_CONFIG = {
     'intents':{
@@ -7,19 +11,54 @@ BOT_CONFIG = {
             'examples':['HI', 'HELLO', 'GOOD AFTERNOON'],
             'responces':["HI!", 'HELLO!', 'GOOD AFTERNOON!']
         },
+        'weather':{
+            'examples':['what\'s the weather today', 'is it raining', 'is it cold'],
+            'responces':["yes", 'no', 'cold']
+        },
+        'hobby':{
+            'examples':['hobby', 'what do u like', 'spend time'],
+            'responces':["collecting stamp", 'listening music', 'playing']
+        },        
+        'sport':{
+            'examples':['sport', 'game', 'football'],
+            'responces':["hokkeys!", 'chess', 'swimming']
+        },        
+        'family':{
+            'examples':['brother', 'sister', 'mother'],
+            'responces':["hi brother", 'hi sis!', 'hello father']
+        },        
+        'fam':{
+            'examples':['men', 'woman', 'boy'],
+            'responces':["hi men", 'hi woman', 'hello boy']
+        },        
+        'bad':{
+            'examples':['angry', 'bad', 'sad'],
+            'responces':["keep calm", 'lets chill', 'cool dawn']
+        },
+        'good':{
+            'examples':['well done', 'excellent', 'good for u'],
+            'responces':["u r perfect", 'ae', 'wassup']
+        },
+        'pets':{
+            'examples':['cat', 'dog', 'horse'],
+            'responces':["good cat", 'good dog', 'good horse']
+        },
         'bye':{
-            'examples':["BYE", "GOOD BYE", "ARIVIDERCHY"],
-            'responces':["BYE!", "GOOD BYE!", "ARIVIDERCHY!"]
+            'examples':["BYE2", "GOOD BYE2", "ARIVIDERCHY2"],
+            'responces':["2BYE!", "2GOOD BYE!", "2ARIVIDERCHY!"]
         }
     }
 }
 
+# можно подгрузить дикт из файла:
+# with open('/filename.json', 'r') as f
+#  BOT_CONFIG = json.load(f)
 
 def clean(text):
-  text = text.lower()    #регистр
+  text = text.lower()    #перевод в нижний регистр
   cleaned_text = ''    #оставляем только буквы
   for ch in text:
-    if ch in 'abcdefghijklmnopqrstuxwz':
+    if ch in '1234567890abcdefghijklmnopqrstuxwz ':
       cleaned_text = cleaned_text+ch
   return cleaned_text
 
@@ -34,13 +73,46 @@ def get_intent(text):
   return 'intent not found'
   
 
-def bot(questions):
-  intent = get_intent(question)
-  if intent != 'intent not found':
-    print(random.choice(BOT_CONFIG['intents'][intent]['responces']))
-  else: print(intent)
+X=[]
+y=[]
 
+for intent in BOT_CONFIG['intents'].keys():
+  try:
+    for example in BOT_CONFIG['intents'][intent]['examples']:
+      X.append(example)
+      y.append(intend)
+  except:
+    pass
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.5, random_state=42)
+    
+vectorizer = CountVectorizer(preprocessor=clean, analyzer='char', ngram_range=(2,3))
+X_train_vect=vectorizer.fit_transform(X_train)
+X_test_vect=vectorizer.transform(X_test)
+
+log_reg = LogisticRegression(C=0.2)
+log_reg.fit(X_train_vect, y_train)
+
+def get_intent_by_model(text):
+  return log_reg.predict(vectorizer.transform([text]))[0]
+  
+def bot(question):
+  intent=get_intent_by_model(question)
+  return random.choice(BOT_CONFIG['intents'][intent]['responces'])
+  
 question = ''
-while question != 'stop':
-  question=input('Write here ')
+while True:
+  question = input('Write here ')
+  if question != 'stop':
+      answer = bot(question)
+      print(answer)
   bot(question)
+  else:
+      break  
+    
+    
+    
+    
+    
+    
