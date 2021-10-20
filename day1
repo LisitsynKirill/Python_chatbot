@@ -69,7 +69,7 @@ def get_intent(text):
       w1 = clean(example)
       w2 = clean(text)
       if nltk.edit_distance(w1, w2) / max(len(w1), len(w2)) <0.4:
-        return intent
+        return intent #получаем найденное значение ключа intents
   return 'intent not found'
   
 
@@ -97,7 +97,7 @@ log_reg.fit(X_train_vect, y_train)
 def get_intent_by_model(text):
   return log_reg.predict(vectorizer.transform([text]))[0]
   
-def bot(question):
+def bot(question): #функция подготовки ответа бота
   intent=get_intent_by_model(question)
   return random.choice(BOT_CONFIG['intents'][intent]['responces'])
   
@@ -105,7 +105,7 @@ question = ''
 while True:
   question = input('Write here ')
   if question != 'stop':
-      answer = bot(question)
+      answer = bot(question) #вызов функции подготовки ответа
       print(answer)
   bot(question)
   else:
